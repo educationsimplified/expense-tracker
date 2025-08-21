@@ -55,6 +55,12 @@
     <select id="year">
       <option value="all">All</option>
     </select>
+
+    <label for="day">Select Day:</label>
+    <select id="day">
+      <option value="all">All</option>
+    </select>
+
     <button onclick="applyFilter()">Apply Filter</button>
   </div>
 
@@ -88,6 +94,7 @@
 
       let monthSet = new Set();
       let yearSet = new Set();
+      let daySet = new Set();
 
       rows.forEach(row => {
         if (row.trim() === "") return;
@@ -98,14 +105,15 @@
 
         savingsData.push({ date, amountDay, amountTotal });
 
-        // Collect unique months & years
+        // Collect unique months, years, and days
         monthSet.add(`${date.getMonth()}-${date.toLocaleString('default', { month: 'long' })}`);
         yearSet.add(date.getFullYear());
+        daySet.add(date.getDate());
       });
 
       // Populate month filter
       let monthSelect = document.getElementById("month");
-      [...monthSet].sort().forEach(m => {
+      [...monthSet].sort((a, b) => parseInt(a) - parseInt(b)).forEach(m => {
         const [num, name] = m.split("-");
         let opt = document.createElement("option");
         opt.value = num;
@@ -122,12 +130,22 @@
         yearSelect.appendChild(opt);
       });
 
+      // Populate day filter
+      let daySelect = document.getElementById("day");
+      [...daySet].sort((a, b) => a - b).forEach(d => {
+        let opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        daySelect.appendChild(opt);
+      });
+
       applyFilter(); // Initial load
     }
 
     function applyFilter() {
       let monthFilter = document.getElementById("month").value;
       let yearFilter = document.getElementById("year").value;
+      let dayFilter = document.getElementById("day").value;
 
       let tableBody = document.querySelector("#savings-table tbody");
       tableBody.innerHTML = "";
@@ -138,12 +156,16 @@
       savingsData.forEach(entry => {
         const year = entry.date.getFullYear();
         const month = entry.date.getMonth();
+        const day = entry.date.getDate();
 
         // Year filter
         if (yearFilter !== "all" && year != yearFilter) return;
 
         // Month filter
         if (monthFilter !== "all" && month != monthFilter) return;
+
+        // Day filter
+        if (dayFilter !== "all" && day != dayFilter) return;
 
         // Add row to table
         let tr = document.createElement("tr");
