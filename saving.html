@@ -1,186 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Savings Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
-    }
-    h1, h2 {
-      color: #333;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      background: #fff;
-      margin-bottom: 20px;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-      text-align: left;
-      padding: 8px;
-    }
-    th {
-      background: #007BFF;
-      color: white;
-    }
-    .summary {
-      background: #fff;
-      padding: 15px;
-      border: 1px solid #ccc;
-    }
-    .filters {
-      margin-bottom: 20px;
-    }
-    select, button {
-      padding: 5px;
-      margin-right: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzair Ahmed Savings Tracker</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font 'Inter' for a sleek look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a sleeker look on a light theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
 </head>
-<body>
-  <h1>Savings Tracker</h1>
+<body class="bg-gray-100 text-gray-800 p-6 md:p-12 min-h-screen">
 
-  <div class="filters">
-    <label for="month">Select Month:</label>
-    <select id="month">
-      <option value="all">All</option>
-    </select>
+    <!-- Home Button -->
+    <a href="index.html" class="inline-flex items-center space-x-2 bg-gray-200 text-gray-600 py-2 px-4 rounded-full border border-gray-300 hover:bg-gray-300 transition-colors duration-300 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+        <span>Home</span>
+    </a>
 
-    <label for="year">Select Year:</label>
-    <select id="year">
-      <option value="all">All</option>
-    </select>
+    <!-- Main Dashboard Container -->
+    <div class="bg-white rounded-2xl p-6 md:p-10 max-w-5xl mx-auto shadow-2xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600 mb-6 text-center">
+            Savings Tracker Dashboard
+        </h1>
 
-    <label for="day">Select Day:</label>
-    <select id="day">
-      <option value="all">All</option>
-    </select>
+        <!-- Filter Section -->
+        <div class="flex flex-wrap items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-8 p-4 bg-gray-200 rounded-xl">
+            <label for="month" class="text-sm font-medium">Select Month:</label>
+            <select id="month" class="bg-white text-gray-800 rounded-md py-2 px-3 border border-gray-300 focus:outline-none focus:ring focus:border-blue-400"></select>
 
-    <button onclick="applyFilter()">Apply Filter</button>
-  </div>
+            <label for="year" class="text-sm font-medium">Select Year:</label>
+            <select id="year" class="bg-white text-gray-800 rounded-md py-2 px-3 border border-gray-300 focus:outline-none focus:ring focus:border-blue-400"></select>
 
-  <h2>Savings Records</h2>
-  <table id="savings-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Amount Saved (Day)</th>
-        <th>Total Amount Saved</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+            <label for="day" class="text-sm font-medium">Select Day:</label>
+            <select id="day" class="bg-white text-gray-800 rounded-md py-2 px-3 border border-gray-300 focus:outline-none focus:ring focus:border-blue-400"></select>
 
-  <div class="summary">
-    <h2>Summary</h2>
-    <p><b>Total Selected Month Saved:</b> <span id="monthly-total">0</span></p>
-    <p><b>Total Selected Year Saved:</b> <span id="yearly-total">0</span></p>
-  </div>
+            <button onclick="applyFilter()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition-colors duration-300">
+                Apply Filter
+            </button>
+        </div>
 
-  <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS84Iv_ZnhXPvqjNkMJt35yAcnIW_CioUeXlyB9PxDw3sssSJ6tQChwa-IOcDRo-XOCBz9ff255GNlw/pub?gid=49041980&single=true&output=csv";
+        <!-- Savings Records Table -->
+        <div class="overflow-x-auto mb-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Savings Records</h2>
+            <table id="savings-table" class="min-w-full bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+                <thead>
+                    <tr class="bg-gray-300 text-gray-700 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Date</th>
+                        <th class="py-3 px-6 text-left">Amount Saved (Day)</th>
+                        <th class="py-3 px-6 text-left">Total Amount Saved</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 text-sm font-light">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
 
-    let savingsData = [];
+        <!-- Summary Section -->
+        <div class="bg-gray-200 rounded-xl p-6 shadow-lg border border-gray-300">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-lg p-4">
+                    <p class="text-sm font-medium text-gray-500">Total Selected Month Saved:</p>
+                    <p id="monthly-total" class="text-2xl md:text-3xl font-bold text-emerald-600 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-lg p-4">
+                    <p class="text-sm font-medium text-gray-500">Total Selected Year Saved:</p>
+                    <p id="yearly-total" class="text-2xl md:text-3xl font-bold text-emerald-600 mt-1">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    async function loadCSV() {
-      const response = await fetch(csvUrl);
-      const data = await response.text();
-      const rows = data.split("\n").slice(1); // skip header
+    <!-- JavaScript to handle data loading and filtering -->
+    <script>
+        // Google Sheet CSV URL for savings data
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS84Iv_ZnhXPvqjNkMJt35yAcnIW_CioUeXlyB9PxDw3sssSJ6tQChwa-IOcDRo-XOCBz9ff255GNlw/pub?gid=49041980&single=true&output=csv";
 
-      let monthSet = new Set();
-      let yearSet = new Set();
-      let daySet = new Set();
+        let savingsData = [];
 
-      rows.forEach(row => {
-        if (row.trim() === "") return;
-        const cols = row.split(",");
-        const date = new Date(cols[0]);
-        const amountDay = parseFloat(cols[1]) || 0;
-        const amountTotal = parseFloat(cols[2]) || 0;
+        async function loadCSV() {
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                const rows = data.split("\n").slice(1); // skip header
 
-        savingsData.push({ date, amountDay, amountTotal });
+                let monthSet = new Set();
+                let yearSet = new Set();
+                let daySet = new Set();
 
-        // Collect unique months, years, and days
-        monthSet.add(`${date.getMonth()}-${date.toLocaleString('default', { month: 'long' })}`);
-        yearSet.add(date.getFullYear());
-        daySet.add(date.getDate());
-      });
+                rows.forEach(row => {
+                    if (row.trim() === "") return;
+                    const cols = row.split(",");
+                    const date = new Date(cols[0]);
+                    const amountDay = parseFloat(cols[1]) || 0;
+                    const amountTotal = parseFloat(cols[2]) || 0;
 
-      // Populate month filter
-      let monthSelect = document.getElementById("month");
-      [...monthSet].sort((a, b) => parseInt(a) - parseInt(b)).forEach(m => {
-        const [num, name] = m.split("-");
-        let opt = document.createElement("option");
-        opt.value = num;
-        opt.textContent = name;
-        monthSelect.appendChild(opt);
-      });
+                    if (!isNaN(date.getTime())) { // Check for valid date
+                        savingsData.push({ date, amountDay, amountTotal });
+                        
+                        // Collect unique months, years, and days
+                        monthSet.add(`${date.getMonth()}-${date.toLocaleDateString('default', { month: 'long' })}`);
+                        yearSet.add(date.getFullYear());
+                        daySet.add(date.getDate());
+                    }
+                });
 
-      // Populate year filter
-      let yearSelect = document.getElementById("year");
-      [...yearSet].sort().forEach(y => {
-        let opt = document.createElement("option");
-        opt.value = y;
-        opt.textContent = y;
-        yearSelect.appendChild(opt);
-      });
+                // Populate month filter
+                let monthSelect = document.getElementById("month");
+                monthSelect.innerHTML = `<option value="all">All</option>`;
+                [...monthSet].sort((a, b) => parseInt(a) - parseInt(b)).forEach(m => {
+                    const [num, name] = m.split("-");
+                    let opt = document.createElement("option");
+                    opt.value = num;
+                    opt.textContent = name;
+                    monthSelect.appendChild(opt);
+                });
 
-      // Populate day filter
-      let daySelect = document.getElementById("day");
-      [...daySet].sort((a, b) => a - b).forEach(d => {
-        let opt = document.createElement("option");
-        opt.value = d;
-        opt.textContent = d;
-        daySelect.appendChild(opt);
-      });
+                // Populate year filter
+                let yearSelect = document.getElementById("year");
+                yearSelect.innerHTML = `<option value="all">All</option>`;
+                [...yearSet].sort().forEach(y => {
+                    let opt = document.createElement("option");
+                    opt.value = y;
+                    opt.textContent = y;
+                    yearSelect.appendChild(opt);
+                });
 
-      applyFilter(); // Initial load
-    }
+                // Populate day filter
+                let daySelect = document.getElementById("day");
+                daySelect.innerHTML = `<option value="all">All</option>`;
+                [...daySet].sort((a, b) => a - b).forEach(d => {
+                    let opt = document.createElement("option");
+                    opt.value = d;
+                    opt.textContent = d;
+                    daySelect.appendChild(opt);
+                });
 
-    function applyFilter() {
-      let monthFilter = document.getElementById("month").value;
-      let yearFilter = document.getElementById("year").value;
-      let dayFilter = document.getElementById("day").value;
+                applyFilter(); // Initial load
+            } catch (error) {
+                console.error("Error loading CSV data:", error);
+            }
+        }
 
-      let tableBody = document.querySelector("#savings-table tbody");
-      tableBody.innerHTML = "";
+        function applyFilter() {
+            let monthFilter = document.getElementById("month").value;
+            let yearFilter = document.getElementById("year").value;
+            let dayFilter = document.getElementById("day").value;
 
-      let monthlyTotal = 0;
-      let yearlyTotal = 0;
+            let tableBody = document.querySelector("#savings-table tbody");
+            tableBody.innerHTML = "";
 
-      savingsData.forEach(entry => {
-        const year = entry.date.getFullYear();
-        const month = entry.date.getMonth();
-        const day = entry.date.getDate();
+            let monthlyTotal = 0;
+            let yearlyTotal = 0;
 
-        // Year filter
-        if (yearFilter !== "all" && year != yearFilter) return;
+            savingsData.forEach(entry => {
+                const year = entry.date.getFullYear();
+                const month = entry.date.getMonth();
+                const day = entry.date.getDate();
 
-        // Month filter
-        if (monthFilter !== "all" && month != monthFilter) return;
+                // Check for year filter
+                if (yearFilter !== "all" && year != yearFilter) return;
 
-        // Day filter
-        if (dayFilter !== "all" && day != dayFilter) return;
+                // Check for month filter
+                if (monthFilter !== "all" && month != monthFilter) return;
 
-        // Add row to table
-        let tr = document.createElement("tr");
-        tr.innerHTML = `<td>${entry.date.toLocaleDateString()}</td><td>${entry.amountDay}</td><td>${entry.amountTotal}</td>`;
-        tableBody.appendChild(tr);
+                // Check for day filter
+                if (dayFilter !== "all" && day != dayFilter) return;
 
-        yearlyTotal += entry.amountDay;
-        monthlyTotal += entry.amountDay;
-      });
+                // Add row to table
+                let tr = document.createElement("tr");
+                tr.className = "border-b border-gray-300 hover:bg-gray-300 transition-colors duration-200";
+                tr.innerHTML = `
+                    <td class="py-3 px-6 text-left whitespace-nowrap">${entry.date.toLocaleDateString()}</td>
+                    <td class="py-3 px-6 text-left">₹${entry.amountDay.toFixed(2)}</td>
+                    <td class="py-3 px-6 text-left">₹${entry.amountTotal.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(tr);
 
-      document.getElementById("monthly-total").innerText = monthlyTotal;
-      document.getElementById("yearly-total").innerText = yearlyTotal;
-    }
+                yearlyTotal += entry.amountDay;
+                monthlyTotal += entry.amountDay;
+            });
 
-    loadCSV();
-  </script>
+            document.getElementById("monthly-total").innerText = `₹${monthlyTotal.toFixed(2)}`;
+            document.getElementById("yearly-total").innerText = `₹${yearlyTotal.toFixed(2)}`;
+        }
+
+        // Load the data when the window is loaded
+        window.onload = loadCSV;
+    </script>
 </body>
 </html>
