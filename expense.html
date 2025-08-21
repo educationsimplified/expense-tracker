@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 8px;
+    }
+    th {
+      background: #007BFF;
+      color: white;
+    }
+    .summary {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+    }
+    .filters {
+      margin-bottom: 20px;
+    }
+    select, button {
+      padding: 5px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Expense Tracker</h1>
+
+  <div class="filters">
+    <label for="month">Select Month:</label>
+    <select id="month">
+      <option value="all">All</option>
+    </select>
+
+    <label for="year">Select Year:</label>
+    <select id="year">
+      <option value="all">All</option>
+    </select>
+    <button onclick="applyFilter()">Apply Filter</button>
+  </div>
+
+  <h2>Daily Expenses</h2>
+  <table id="daily-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Item</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="summary">
+    <h2>Summary</h2>
+    <p><b>Total Selected Month Expense:</b> <span id="monthly-total">0</span></p>
+    <p><b>Total Selected Year Expense:</b> <span id="yearly-total">0</span></p>
+  </div>
+
+  <script>
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS84Iv_ZnhXPvqjNkMJt35yAcnIW_CioUeXlyB9PxDw3sssSJ6tQChwa-IOcDRo-XOCBz9ff255GNlw/pub?gid=304202630&single=true&output=csv";
+
+    let expenseData = [];
+
+    async function loadCSV() {
+      const response = await fetch(csvUrl);
+      const data = await response.text();
+      const rows = data.split("\n").slice(1); // skip header
+
+      let monthSet = new Set();
+      let yearSet = new Set();
+
+      rows.forEach(row => {
+        if (row.trim() === "") return;
+        const cols = row.split(",");
+        const date = new Date(cols[0]);
+        const amount = parseFloat(cols[1]) || 0;
+        const item = cols[2];
+
+        expenseData.push({ date, amount, item });
+
+        // Collect unique months & years
+        monthSet.add(`${date.getMonth()}-${date.toLocaleString('default', { month: 'long' })}`);
+        yearSet.add(date.getFullYear());
+      });
+
+      // Populate month filter
+      let monthSelect = document.getElementById("month");
+      [...monthSet].sort().forEach(m => {
+        const [num, name] = m.split("-");
+        let opt = document.createElement("option");
+        opt.value = num;
+        opt.textContent = name;
+        monthSelect.appendChild(opt);
+      });
+
+      // Populate year filter
+      let yearSelect = document.getElementById("year");
+      [...yearSet].sort().forEach(y => {
+        let opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      });
+
+      applyFilter(); // Initial load
+    }
+
+    function applyFilter() {
+      let monthFilter = document.getElementById("month").value;
+      let yearFilter = document.getElementById("year").value;
+
+      let dailyTable = document.querySelector("#daily-table tbody");
+      dailyTable.innerHTML = "";
+
+      let monthlyTotal = 0;
+      let yearlyTotal = 0;
+
+      expenseData.forEach(exp => {
+        const year = exp.date.getFullYear();
+        const month = exp.date.getMonth();
+
+        // Year filter
+        if (yearFilter !== "all" && year != yearFilter) return;
+
+        // Month filter
+        if (monthFilter !== "all" && month != monthFilter) return;
+
+        // Add row to table
+        let tr = document.createElement("tr");
+        tr.innerHTML = `<td>${exp.date.toLocaleDateString()}</td><td>${exp.amount}</td><td>${exp.item}</td>`;
+        dailyTable.appendChild(tr);
+
+        yearlyTotal += exp.amount;
+        monthlyTotal += exp.amount;
+      });
+
+      document.getElementById("monthly-total").innerText = monthlyTotal;
+      document.getElementById("yearly-total").innerText = yearlyTotal;
+    }
+
+    loadCSV();
+  </script>
+</body>
+</html>
